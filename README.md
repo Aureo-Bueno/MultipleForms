@@ -59,8 +59,8 @@ src/
 1. Clone the repository:
 ```
 
-git clone <repository-url>
-cd <project-folder>
+git clone https://github.com/Aureo-Bueno/MultipleForms
+cd MultipleForms
 
 ```
 
