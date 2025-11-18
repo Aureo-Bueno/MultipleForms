@@ -1,11 +1,10 @@
-import { FormProvider } from "./context/FormContext";
-import { Router } from "./Router";
+import { FormProvider } from "./context/form";
+import { Router } from "./routes/provider";
 
-
-export const App = () => {
-    return (
-        <FormProvider>
-            <Router />
-        </FormProvider>
-    );
+export function App() {
+  return (
+    <FormProvider>
+      <Router />
+    </FormProvider>
+  );
 }

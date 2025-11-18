@@ -1,19 +1,24 @@
-import * as C from './styles';
+import * as S from "./styles";
 
-type Props = {
-    title: string;
-    description: string;
-    selected: boolean;
-    onClick: () => void;
-}
+type SelectOptionProps = {
+  title: string;
+  description: string;
+  selected: boolean;
+  onClick: () => void;
+};
 
-export const SelectOption = ({title, description, selected, onClick}: Props) => {
-    return (
-        <C.Container onClick={onClick} selected={selected}>
-            <C.Info>
-                <C.Title>{title}</C.Title>
-                <C.Description>{description}</C.Description>
-            </C.Info>
-        </C.Container>
-    );
+export function SelectOption({
+  title,
+  description,
+  selected,
+  onClick,
+}: SelectOptionProps) {
+  return (
+    <S.Container onClick={onClick} selected={selected}>
+      <S.Info>
+        <S.Title>{title}</S.Title>
+        <S.Description>{description}</S.Description>
+      </S.Info>
+    </S.Container>
+  );
 }

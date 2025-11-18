@@ -1,81 +1,99 @@
-import { ChangeEvent, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
-import { Theme } from '../../components/Theme';
-import { useForm, FormActions } from '../../context/FormContext';
-import * as S from './styles';
+import { ChangeEvent, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { Theme } from "../../components/Theme";
+import * as S from "./styles";
+import { FormActions, useForm } from "../../context/form";
+import FormField from "../../components/FormField";
+import { Button } from "../../components/Button";
+import { HeaderForm } from "../../components/HeaderForm";
+import { BackButton } from "../../components/BackButton";
 
-export const FormContact = () => {
-    const navigate =  useNavigate();
-    const {state, dispatch} = useForm();
+export function FormContact(): JSX.Element {
+  const navigate = useNavigate();
+  const { state, dispatch } = useForm();
+  const [githubError, setGithubError] = useState<string>("");
+  const [emailError, setEmailError] = useState<string>("");
 
-    useEffect(() => {
-        if (state.name === '') {
-            navigate('/');
-        }else{
-            dispatch({
-                type: FormActions.setCurrentStep,
-                payload: 3
-            })
-        }
-    }, []);
-
-    const handleNextStep = () => {
-        if (state.email !== '' && state.github !== '') {
-            console.log(state);
-        }else{
-            alert("Preencha os dados.");
-        }
-        
+  useEffect(() => {
+    if (state.name === "") {
+      navigate("/");
+      return;
     }
 
-    const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
-        dispatch({
-            type: FormActions.setEmail,
-            payload: e.target.value
-        });
+    dispatch({
+      type: FormActions.SET_CURRENT_STEP,
+      payload: 3,
+    });
+  }, []);
+
+  const handleNextStep = (): void => {
+    if (state.email !== "" && state.github !== "") {
+      console.log(state);
+    } else {
+      alert("Preencha os dados.");
     }
+  };
 
-    const handleGithubChange = (e: ChangeEvent<HTMLInputElement>) => {
-        dispatch({
-            type: FormActions.setGithub,
-            payload: e.target.value
-        });
+  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    const value = e.target.value;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    dispatch({
+      type: FormActions.SET_EMAIL,
+      payload: value,
+    });
+
+    if (value && !emailRegex.test(value)) {
+      setEmailError("E-mail inválido");
+    } else {
+      setEmailError("");
     }
-    
-    
-    
-    return (
-        <Theme>
-            <S.Container>
-                <p>Passo 3/3</p>
-                <h1>Legal {state.name}, onde te achamos?</h1>
-                <p>Preencha com seus contatos para conseguirmos entrar em contato</p>
-                <hr />
+  };
 
-                <label htmlFor="">
-                    Qual seu e-mail?
-                    <input 
-                        type="email"
-                        value={state.email}
-                        onChange={handleEmailChange}
-                    />
-                </label>
+  const handleGithubChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    const value = e.target.value;
+    const githubRegex = /^(https?:\/\/)?(www\.)?github\.com\/[\w-]+\/?$/;
 
-                <label htmlFor="">
-                    Qual seu GitHub?
-                    <input 
-                        type="url"
-                        value={state.github}
-                        onChange={handleGithubChange}
-                    />
-                </label>
-               
-               
+    dispatch({
+      type: FormActions.SET_GITHUB,
+      payload: value,
+    });
 
-                <Link to="/second" className="backButton">Voltar</Link>
-                <button onClick={handleNextStep}>Finalizar Cadastro</button>
-            </S.Container>
-        </Theme>
-    );
+    if (value && !githubRegex.test(value)) {
+      setGithubError("Formato inválido");
+    } else {
+      setGithubError("");
+    }
+  };
+
+  return (
+    <Theme>
+      <S.Container>
+        <HeaderForm
+          magicStep="Passo 3/3"
+          title={`Legal ${state.name}, onde te achamos?`}
+          description="Preencha com seus contatos para conseguirmos entrar em contato"
+        />
+        <FormField
+          label="Qual seu E-mail?"
+          type="email"
+          value={state.email}
+          onChange={handleEmailChange}
+          error={emailError}
+        />
+
+        <FormField
+          label="Qual seu GitHub?"
+          type="url"
+          value={state.github}
+          onChange={handleGithubChange}
+          error={githubError}
+        />
+
+        <BackButton to="/level-program">Voltar</BackButton>
+        <Button onClick={handleNextStep}>Finalizar Cadastro</Button>
+      </S.Container>
+    </Theme>
+  );
 }

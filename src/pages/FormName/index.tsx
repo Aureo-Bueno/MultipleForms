@@ -1,57 +1,75 @@
-import e from 'express';
-import { ChangeEvent, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Theme } from '../../components/Theme';
-import { useForm, FormActions } from '../../context/FormContext';
-import * as S from './styles';
+import { ChangeEvent, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Theme } from "../../components/Theme";
+import * as S from "./styles";
+import { FormActions, useForm } from "../../context/form";
+import { Button } from "../../components/Button";
+import FormField from "../../components/FormField";
+import { HeaderForm } from "../../components/HeaderForm";
 
-export const FormName = () => {
-    const navigate =  useNavigate();
-    const {state, dispatch} = useForm();
+export function FormName(): JSX.Element {
+  const navigate = useNavigate();
+  const { state, dispatch } = useForm();
+  const [nameError, setNameError] = useState<string>("");
+  const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
 
-    useEffect(() => {
-        dispatch({
-            type: FormActions.setCurrentStep,
-            payload: 1
-        })
-    }, []);
+  useEffect(() => {
+    dispatch({
+      type: FormActions.SET_CURRENT_STEP,
+      payload: 1,
+    });
+  }, []);
 
-    const handleNextStep = () => {
-        if (state.name !== '') {
-            navigate('/second');
-        }else{
-            alert('Preencha os dados.');
-        }
-        
+  const handleNextStep = (): void => {
+    if (state.name !== "") {
+      navigate("/level-program");
+    } else {
+      alert("Por favor, preencha o seu nome.");
+    }
+  };
+
+  const handleChangeName = (e: ChangeEvent<HTMLInputElement>): void => {
+    const value = e.target.value;
+
+    if (value.length > 40) {
+      setNameError("O nome não pode ter mais de 40 caracteres.");
+      return;
     }
 
-    const handleChangeName = (e: ChangeEvent<HTMLInputElement>) => {
-        dispatch({
-            type: FormActions.setName,
-            payload: e.target.value
-        });
+    if (value.length === 1 && value === " ") {
+      setNameError("O nome não pode começar com espaço.");
+      return;
     }
-    
-    return (
-        <Theme>
-            <S.Container>
-                <p>Passo 1/3</p>
-                <h1>Vamos começar com o seu nome</h1>
-                <p>Preencha o campo abaixo com o seu nome completo.</p>
-                <hr />
 
-                <label htmlFor="">
-                    Seu nome completo 
-                    <input
-                      type="text"
-                      autoFocus
-                      value={state.name}
-                      onChange={handleChangeName}
-                    />
-                </label>
+    setIsButtonDisabled(value.trim() === "");
+    setNameError("");
 
-                <button onClick={handleNextStep}>Próximo</button>
-            </S.Container>
-        </Theme>
-    );
+    dispatch({
+      type: FormActions.SET_NAME,
+      payload: value,
+    });
+  };
+
+  return (
+    <Theme>
+      <S.Container>
+        <HeaderForm
+          magicStep="Passo 1/3"
+          title="Vamos começar com o seu nome"
+          description="Preencha o campo abaixo com o seu nome completo."
+        />
+        <FormField
+          label="Seu nome completo"
+          type="text"
+          value={state.name}
+          onChange={handleChangeName}
+          error={nameError}
+        />
+
+        <Button onClick={handleNextStep} disabled={isButtonDisabled}>
+          Próximo
+        </Button>
+      </S.Container>
+    </Theme>
+  );
 }

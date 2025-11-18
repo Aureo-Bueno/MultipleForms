@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  vite-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vite-production-app
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./dist:/app/dist:ro
+    restart: unless-stopped
+    networks:
+      - vite-network
+
+  vite-dev:
+    image: node:22-alpine
+    container_name: vite-dev-app
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    command: sh -c "npm install -g pnpm && pnpm install && pnpm run dev"
+    environment:
+      - NODE_ENV=development
+    networks:
+      - vite-network
+
+networks:
+  vite-network:
+    driver: bridge
